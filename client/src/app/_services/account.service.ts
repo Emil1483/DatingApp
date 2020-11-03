@@ -21,6 +21,8 @@ export class AccountService {
         if (!user) return;
         localStorage.setItem('user', JSON.stringify(user));
         this.currentUserSource.next(user);
+
+        return user;
       })
     );
   }
@@ -28,9 +30,10 @@ export class AccountService {
   register(model: any) {
     return this.http.post(this.baseUrl + 'account/register', model).pipe(
       map((user: User) => {
-        if (!user) return user;
+        if (!user) return;
         localStorage.setItem('user', JSON.stringify(user));
         this.currentUserSource.next(user);
+
         return user;
       }),
     );
