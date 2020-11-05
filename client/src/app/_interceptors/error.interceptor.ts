@@ -22,22 +22,10 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         switch (error.status) {
           case 400:
-            const errors = error.error.errors;
-            if (errors) {
-              const modalStateErrors = [];
-              for (const key in errors) {
-                if (errors[key]) {
-                  modalStateErrors.push(...errors[key]);
-                }
-              }
-              throw modalStateErrors;
-            }
-
-            this.toastr.error(error.statusText, error.status);
-
+            this.handle(error);
             break;
           case 401:
-            this.toastr.error(error.statusText === 'OK' ? 'Unauthorised' : error.statusText, error.status);
+            this.handle(error);
             break;
           case 404:
             this.router.navigateByUrl('/not-found');
@@ -56,5 +44,34 @@ export class ErrorInterceptor implements HttpInterceptor {
         return throwError(error);
       })
     );
+  }
+
+  private handle(error: any) {
+    const errors = error.error?.errors;
+    if (errors) {
+      const modalStateErrors = [];
+      for (const key in errors) {
+        if (errors[key]) {
+          modalStateErrors.push(...errors[key]);
+        }
+      }
+      throw modalStateErrors;
+    }
+
+    if (typeof error.error == 'string') {
+      this.toastr.error(error.error);
+      return;
+    }
+
+    this.toastr.error(this.getStatusText(error.status), error.status);
+  }
+
+  private getStatusText(status: number): string {
+    switch (status) {
+      case 401:
+        return 'Unauthorized';
+      default:
+        return 'OK';
+    }
   }
 }
