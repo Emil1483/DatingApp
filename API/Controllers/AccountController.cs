@@ -47,6 +47,9 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
+            if (loginDto.Username == null || loginDto.Username == "") return BadRequest("username is required to login");
+            if (loginDto.Password == null || loginDto.Password == "") return BadRequest("password is required to login");
+
             var user = await _context.Users.SingleOrDefaultAsync(user => user.UserName == loginDto.Username.ToLower());
 
             if (user == null) return Unauthorized("invalid username");
