@@ -18,8 +18,6 @@ export class MemberDetailComponent implements OnInit {
   constructor(private membersService: MembersService, private route: ActivatedRoute) { }
 
   async ngOnInit(): Promise<void> {
-    await this.loadMember();
-
     this.galleryOptions = [
       {
         width: '500px',
@@ -30,6 +28,8 @@ export class MemberDetailComponent implements OnInit {
         preview: false,
       },
     ];
+
+    await this.loadMember();
 
     this.galleryImages = this.member.photos.map(photo => {
       return {
