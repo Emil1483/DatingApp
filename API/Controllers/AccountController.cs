@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,7 +51,9 @@ namespace API.Controllers
             if (loginDto.Username == null || loginDto.Username == "") return BadRequest("username is required to login");
             if (loginDto.Password == null || loginDto.Password == "") return BadRequest("password is required to login");
 
-            var user = await _context.Users.SingleOrDefaultAsync(user => user.UserName == loginDto.Username.ToLower());
+            var user = await _context.Users
+                .Include(p => p.Photos)
+                .SingleOrDefaultAsync(user => user.UserName == loginDto.Username.ToLower());
 
             if (user == null) return Unauthorized("invalid username");
 
@@ -66,6 +69,7 @@ namespace API.Controllers
             {
                 Username = user.UserName,
                 Token = _tokenService.CreateToken(user),
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
             };
         }
 
